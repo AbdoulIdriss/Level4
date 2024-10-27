@@ -1,9 +1,9 @@
-const { Router } = requuire('express');
+const { Router } = require('express');
 const router = Router();
 
 const adminController = require('../src/Controllers/admin.controller')
 
-const { verifyIfUserIsLogged } = require('../src/middlewares/admin.middleware')
+const { verifyIfUserIsLogged } = require('../src/middlewares/auth.middleware')
 
 router.get('/welcome', verifyIfUserIsLogged, adminController.welcome)
 

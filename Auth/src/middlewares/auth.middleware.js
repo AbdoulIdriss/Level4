@@ -2,7 +2,7 @@ const authService = require('../services/auth.service')
 
 const verifyLoginBody = async ( req , res , next ) => {
     const body = req.body;
-    if (!body.email || ! body.password) {
+    if (!body.email || !body.password) {
         return res.status(404).json({
             error: true,
             message: 'Body must contain email and password'
@@ -43,6 +43,7 @@ const verifyRegisterBody = async( req , res , next ) => {
     }
 
     const emailIsUnique = await authService.verifyUniqness('email', body.email);
+    console.log(emailIsUnique);
     if (emailIsUnique) {
         return res.status(404).json({
             error: true,
@@ -61,6 +62,54 @@ const verifyRegisterBody = async( req , res , next ) => {
     next();
 };
 
+//create verify reset password body
+
+const verifyResetPasswordBody = async( req , res , next ) => {
+
+    const body = req.body;
+
+    if (!body.password || !body.confirm_password) {
+        return res.status(404).json({
+            error: true,
+            message: 'Body must contain password and confirm_password'
+        })
+    }
+
+    if ( body.password !== body.confirm_password ) {
+        return res.status(404).json({
+            error: true,
+            message: "Passwords don't match."
+        })
+    }
+    next();
+}
+
+//end
+
+//create function to verify if email exist before being redirected to the forget password page
+const verifyIfEmailExistBody = async( req , res , next ) => {
+
+    const body = req.body;
+
+    if (!body.email) {
+        return res.status(404).json({
+            error: true,
+            message: 'Please enter email'
+        })
+    }
+
+    const user = await authService.verifyUniqness('email', body.email);
+    if (user) {
+        return res.status(404).json({
+            error:false,
+            message: 'Valid email'
+        })
+    }
+
+    next();
+};
+//end here
+
 const verifyIfUserIsLogged = async( req , res , next ) => {
 
     const auth = req.header('Authorization');
@@ -72,6 +121,7 @@ const verifyIfUserIsLogged = async( req , res , next ) => {
     }
 
     const verified = await authService.tokenVerify(auth);
+
     if (!verified) {
         return res.status(401).json({
             error: true,
@@ -90,4 +140,4 @@ const verifyIfUserIsLogged = async( req , res , next ) => {
     next();
 }
 
-module.exports = { verifyLoginBody , verifyRegisterBody, verifyIfUserIsLogged }
+module.exports = { verifyLoginBody , verifyRegisterBody, verifyIfUserIsLogged , verifyIfEmailExistBody , verifyResetPasswordBody }

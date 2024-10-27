@@ -1,58 +1,68 @@
-//to get all users 
+const User = require('../Models/Users');
 
-getAllUsers = async( req , res ) => {
-    const q = "SELECT * FROM users";
-    await db.query( q, ( err ,  data ) => {
-        if (err) {
-            res.json(err)
-            console.log(err);
-            
-        }
-        return res.json(data)
-    })
+//Show all users 
+const getAllUsers = async ( req, res ) => {
+
+    try {
+        const users = await User.findAll();
+        res.render('index', {users})
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+};
+
+//Create new user 
+
+const createUser = async( req , res ) => {
+
+    try {
+        const { name , email , password } = req.body;
+        await User.create({ name , email , password });
+        res.status(201).json({
+            error: false,
+            message:'user created succesfully'
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message:'Error creating user'
+        })
+    }
 }
 
-//create a new user 
- createUser = ( req , res ) => {
-    const q = 'INSERT INTO users (username ,email,  userrole, userplan) VALUES(?)';
-    const values = await [
-        req.body.username,
-        req.body.email,
-        req.body.userrole,
-        req.body.userplan
-    ];
-    db.query( q , [values] , (err , data ) => {
-        if(err) return res.send(err)
-        return res.json(data)
-    })
- }
-
- //update an existing book 
-updateUser = ( req ,  res ) => {
-    const id = req.params.id;
-    const q = "UPDATE users SET 'username = ?, email = ? , 'userrole = ?', 'userplan = ?' ";
-    const values = await [
-        req.body.username,
-        req.body.email,
-        req.body.userrole,
-        req.body.userplan
-    ];
-    db.query(q, [...values,id], (err, data) => {
-		if (err) return res.send(err);
-		return res.json(data);
-	});
+const  updateUser = async( req , res ) => {
+    
+    try {
+        const id = req.params.id;
+        const { name , email , password } = req.body;
+        await User.update({ name , email , password } , { where: { id } });
+        res.status().json({
+            error: false,
+            message:'user updated succesfully'
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'Error updating user'
+        })
+    }
 }
 
-//delete an existing user 
+const deleteUser = async( req , res ) => {
+    
+    try {
+        const id = req.params.id;
+        await User.destroy( { where: { id }});
+        res.status(200).json({
+            error: false,
+            message: 'user deleted succesfully'
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'error deleting user'
+        })
+    }
+};
 
-deleteUser = ( req , res ) => {
-    const id = req.params.id;
-    const q = 'DELETE FROM users WHERE id = ? '
-
-    db.query(q, [id], (err, data) => {
-		if (err) return res.send(err);
-		return res.json(data);
-	});
-}
-
-module.exports = { getAllUsers , createUser , updateUser , deleteUser}
+module.exports = { getAllUsers , createUser ,  updateUser , deleteUser }

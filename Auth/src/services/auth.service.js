@@ -2,15 +2,16 @@ const User = require('../Models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const verifyUniqness = async( field , value ) => {
+const verifyUniqness = async ( field , value ) => {
 
-    await User.findOne({ [ field ]: value });
-
+    return await User.findOne({ [ field ]: value });
 }
 
-const hashPassword = async( password ) => {
 
+const hashPassword = async( password ) => {
+    //the salt is used for extra security . For the password + the salt to be hashed together to create a more strong password 
     try {
+
         const salt = await bcrypt.genSalt(10);
 
         return await bcrypt.hash( password , salt );
@@ -53,11 +54,11 @@ const register = async( data ) => {
     data.password = password;
 
     const user = new User(data);
-    await user.save()
+    await user.save();
 
     return {
         error:false,
-        message: 'user registered successfully'
+        message: 'user registered successfully.'
     }
 };
 
@@ -69,7 +70,7 @@ const login = async( user , password ) => {
 
         return {
             error: true,
-            message: 'Invalid email or password'
+            message: 'Invalid email or password.'
         }
     }
 
@@ -78,9 +79,28 @@ const login = async( user , password ) => {
     return {
 
         error: false,
-        message: 'Login successful',
+        message: 'Login successful.',
         token: token
+    }
+};
+
+const checkMail = async( req , res ) => {
+    
+}
+
+const resetPassword = async( data ) => {
+
+    const password = await hashPassword( data.password );
+    data.password = password;
+
+    const user = new User(data.password);
+    await user.password.save()
+
+    return {
+        error:false,
+        message: 'Password modified successfully.'
     }
 }
 
-module.exports = { verifyUniqness , register , login , tokenVerify}
+
+module.exports = { verifyUniqness , register , login , tokenVerify , resetPassword };

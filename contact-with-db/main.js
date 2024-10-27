@@ -7,7 +7,7 @@ const userRoute = require('./routes/user.route')
 
 // const indexRoute = require('./routes/index.route');
 
-mongoose.connect("mongodb://localhost:27017/user_management", )
+mongoose.connect("mongodb://localhost:27017/user_management" )
     .then( connection => {
 
         const app = express();

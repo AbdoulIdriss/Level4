@@ -1,23 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 mongoose.connect('mongodb://localhost:27017/auth')
 
     .then(connection => {
         
         const app = express()
-        app.arguments(express.json());
+        app.use(cors())
+        app.use(express.json());
 
         const authRoute = require('./routes/auth.route');
         const adminRoute = require('./routes/admin.route');
 
-        app.use('/api/auth', authRoute);
-        app.use('/api/auth', adminRoute);
+        app.use('/auth', authRoute);
+        app.use('/admin', adminRoute);
         
 
-        app.listen(3000, () => {
+        app.listen(3001, () => {
 
-            console.log('listening on http://localhost:3000');
+            console.log('listening on http://localhost:3001');
             
         })
 

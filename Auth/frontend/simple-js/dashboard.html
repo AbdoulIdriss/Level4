@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900" >
+    
+    <section class="text-white p-8 text-4xl" >
+
+         <div class="">
+
+            <div class="justify-center">
+    
+                <h1 class="text-center text-white" >Welcome to the dashboard </h1>
+                
+            </div>
+    
+        </div>
+
+
+
+            <button id="logout" type="click" class="text-center hover:underline text-white" > Logout </button>
+
+
+    </section>
+
+    <script>
+
+        function isAuth(isDashboard = false ) {
+
+            const token = localStorage.getItem('token');
+
+            if (isDashboard && !token) {
+                window.location.replace('http://127.0.0.1:5500/frontend/simple-js/login.html');
+                return false;
+            }
+
+            if (!isDashboard && token) {
+                window.location.replace(('http://127.0.0.1:5500/frontend/simple-js/dashboard.html'))
+            }
+        }
+        isAuth(true);
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const logoutButton = document.getElementById('logout');
+
+            if (logoutButton) {
+
+                logoutButton.addEventListener('click', () => {
+
+                    localStorage.removeItem('token');
+
+                    window.location.replace('http://127.0.0.1:5500/frontend/simple-js/login.html');
+
+                })
+            }
+        });
+
+
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</body>
+</html>

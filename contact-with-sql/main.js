@@ -6,7 +6,6 @@ const sequelize = require('./config/database')
 const userRoute = require('./Routes/user.route')
 
 const app = express();
-const port = 6000;
 
 // Parse the requests of content-type 'application/json'
 app.use(bodyParser.json())

@@ -64,8 +64,11 @@ const register = async( data ) => {
 
 const login = async( user , password ) => {
 
+    console.log(user, password );
+    
     const compare = await hashCompare(password , user.password)
-
+    console.log(compare);
+    
     if (!compare) {
 
         return {
@@ -84,17 +87,26 @@ const login = async( user , password ) => {
     }
 };
 
-const checkMail = async( req , res ) => {
+
+
+const resetPassword = async( email , newPassword ) => {
+
+    // const password = await hashPassword( data.password );
+    // data.password = password;
+
+    // const user = new User(data.password);
+    // await user.password.save()
+
+    // return {
+    //     error:false,
+    //     message: 'Password modified successfully.'
+    // }
+
+    const hashedPassword = await hashPassword( newPassword );
     
-}
+    await User.findByIdAndUpdate(email , { password: hashedPassword })
 
-const resetPassword = async( data ) => {
-
-    const password = await hashPassword( data.password );
-    data.password = password;
-
-    const user = new User(data.password);
-    await user.password.save()
+    console.log(hashedPassword);
 
     return {
         error:false,
@@ -103,4 +115,4 @@ const resetPassword = async( data ) => {
 }
 
 
-module.exports = { verifyUniqness , register , login , tokenVerify , resetPassword };
+module.exports = { verifyUniqness , register , login , tokenVerify , resetPassword , hashPassword };

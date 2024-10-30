@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Your Reset Code</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+    <section class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6 dark:bg-gray-800">
+            <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">Enter Your Reset Code</h1>
+            <form id="resetCodeForm" class="space-y-4">
+                <label for="resetCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reset Code:</label>
+                <input type="text" id="resetCode" name="resetCode" required class="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white">
+
+                <button type="submit" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700">
+                    Submit Code
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedResetCode = sessionStorage.getItem('resetCode');
+
+            // Redirect to email verification if resetCode isn't available
+            if (!savedResetCode) {
+                alert("No reset code found. Please verify your email first.");
+                window.location.href = 'http://127.0.0.1:5500/frontend/simple-js/verifyemail.html';
+                return;
+            }
+
+            document.getElementById('resetCodeForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const resetCodeInput = document.getElementById('resetCode').value;
+                const email = sessionStorage.getItem('email'); // Retrieve stored email if available
+
+                // Send email and reset code to validate on the server
+                try {
+                    const response = await fetch('http://localhost:3001/auth/validate-reset-code', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, resetCode: resetCodeInput })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        alert(data.message);
+                    } else {
+                        // Code is correct, proceed to the reset password page
+                        alert("Code validated successfully.");
+                        
+                        window.location.href = 'http://127.0.0.1:5500/frontend/simple-js/resetpassword.html';
+                    }
+                } catch (error) {
+                    console.error('Error validating reset code:', error);
+                    alert("An error occurred. Please try again.");
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

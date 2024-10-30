@@ -1,4 +1,5 @@
 const authService = require('../services/auth.service')
+const Crypto = require('crypto')
 
 const verifyLoginBody = async ( req , res , next ) => {
     const body = req.body;
@@ -68,12 +69,16 @@ const verifyResetPasswordBody = async( req , res , next ) => {
 
     const body = req.body;
 
+    console.log(body);
+    
     if (!body.password || !body.confirm_password) {
         return res.status(404).json({
             error: true,
             message: 'Body must contain password and confirm_password'
-        })
+        })  
+        
     }
+    
 
     if ( body.password !== body.confirm_password ) {
         return res.status(404).json({
@@ -89,24 +94,27 @@ const verifyResetPasswordBody = async( req , res , next ) => {
 //create function to verify if email exist before being redirected to the forget password page
 const verifyIfEmailExistBody = async( req , res , next ) => {
 
-    const body = req.body;
+    const email = req.body.email;
 
-    if (!body.email) {
+    if (!email) {
         return res.status(404).json({
             error: true,
             message: 'Please enter email'
         })
     }
 
-    const user = await authService.verifyUniqness('email', body.email);
-    if (user) {
-        return res.status(404).json({
-            error:false,
-            message: 'Valid email'
+    const emailExist = await authService.verifyUniqness('email', email);
+    console.log(emailExist);
+
+    if (emailExist) {
+        next();
+    } else{
+        return res.json({
+            error: true,
+            message: 'email not found'
         })
     }
 
-    next();
 };
 //end here
 

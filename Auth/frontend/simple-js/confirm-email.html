@@ -16,7 +16,7 @@
                     <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                         Enter your Email
                     </h1>
-                    <form class="space-y-4 md:space-y-6" action="" method="post">
+                    <form class="space-y-4 md:space-y-6" action="http://localhost:3001/auth/verifyemail" method="post">
 
                         <div>
 
@@ -75,10 +75,19 @@
                     console.log(response);
 
                     if (request.ok) {
-                        alert('correct email');
-                        window.location.href = 'http://127.0.0.1:5500/frontend/simple-js/resetpassword.html'
-                    }else {
-                        alert (response.message)
+                        const resetCode = response.resetCode;
+
+                        if (resetCode) 
+                        {
+
+                            sessionStorage.setItem('resetCode', resetCode);
+
+                            window.location.href = 'http://127.0.0.1:5500/frontend/simple-js/showresetcode.html'
+                        }else {
+                            alert (response.message)
+                        }
+                    } else{
+                        alert(response.message)
                     }
                     
                 } catch (error) {

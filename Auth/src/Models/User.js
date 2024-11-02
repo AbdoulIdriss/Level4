@@ -32,15 +32,7 @@ const userSchema = new Schema({
         type: Date,
         required: false,
         default: Date.now
-    },
-    passwordResetCode: {
-        type: String,
-        required: false // Only set when a reset is requested
-    },
-    passwordResetExpires: {
-        type: Date,
-        required: false // Only set when a reset is requested
     }
-})
+});
 
 module.exports = mongoose.model('user', userSchema);

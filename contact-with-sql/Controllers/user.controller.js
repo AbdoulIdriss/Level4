@@ -1,8 +1,8 @@
 const User = require('../Models/Users');
-const sequelize = require('../config/database');
+const sequelize = require('../dbconfig/database');
 
 //Show all users 
-const getAllUsers = async ( req, res ) => {
+const getAllUsers = async ( req , res ) => {
 
     try {
         const users = await User.findAll();
@@ -27,6 +27,7 @@ const createUser = async( req , res ) => {
             message:'user created succesfully'
         })
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             error: true,
             message:'Error creating user'

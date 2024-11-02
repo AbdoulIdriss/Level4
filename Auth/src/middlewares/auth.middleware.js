@@ -1,5 +1,4 @@
 const authService = require('../services/auth.service')
-const Crypto = require('crypto')
 
 const verifyLoginBody = async ( req , res , next ) => {
     const body = req.body;
@@ -63,34 +62,6 @@ const verifyRegisterBody = async( req , res , next ) => {
     next();
 };
 
-//create verify reset password body
-
-const verifyResetPasswordBody = async( req , res , next ) => {
-
-    const body = req.body;
-
-    console.log(body);
-    
-    if (!body.password || !body.confirm_password) {
-        return res.status(404).json({
-            error: true,
-            message: 'Body must contain password and confirm_password'
-        })  
-        
-    }
-    
-
-    if ( body.password !== body.confirm_password ) {
-        return res.status(404).json({
-            error: true,
-            message: "Passwords don't match."
-        })
-    }
-    next();
-}
-
-//end
-
 //create function to verify if email exist before being redirected to the forget password page
 const verifyIfEmailExistBody = async( req , res , next ) => {
 
@@ -103,10 +74,11 @@ const verifyIfEmailExistBody = async( req , res , next ) => {
         })
     }
 
-    const emailExist = await authService.verifyUniqness('email', email);
-    console.log(emailExist);
+    const user = await authService.verifyUniqness('email', email);
+    console.log(user);
 
-    if (emailExist) {
+    if (user) {
+        req.user = user;
         next();
     } else{
         return res.json({
@@ -118,34 +90,80 @@ const verifyIfEmailExistBody = async( req , res , next ) => {
 };
 //end here
 
-const verifyIfUserIsLogged = async( req , res , next ) => {
-
-    const auth = req.header('Authorization');
-    if (!auth) {
-        return res.status(401).json({
-            error : true,
-            messsage: 'Access denied. No token provided'
-        })
-    }
-
-    const verified = await authService.tokenVerify(auth);
-
-    if (!verified) {
-        return res.status(401).json({
+//verify OTP
+//here we verify the email and the code entered by the user
+const verifyOTP = async( req , res , next ) => {
+    const { email , code } = req.body;
+    const verify = await authService.verifyOTP( email, code );
+    if (!verify) {
+        return res.status(400).json({
             error: true,
-            message: 'Access denied. Invalid token'
+            message: 'Invalid OTP'
         })
+    }
+    next()
+}
+//end here
+
+//create verify reset password body
+
+const verifyResetPasswordBody = async( req , res , next ) => {
+
+    const { password , confirm_password , code } = req.body;
+
+    if (!code) {
+         res.status(400).json({
+            error: true,
+            message: 'Please enter code'
+        })
+    }
+    
+    if (!password || !confirm_password) {
+         res.status(400).json({
+            error: true,
+            message: 'Body must contain password and confirm_password'
+        })  
+        
     }
 
-    const user = await authService.verifyUniqness('_id', verified.id)
-    if (!user) {
-        return res.status(401).json({
+    if ( password !== confirm_password ) {
+         res.status(400).json({
             error: true,
-            message: 'Access denied. user not found.'
+            message: "Passwords don't match."
         })
     }
-    req.auth =user;
     next();
 }
 
-module.exports = { verifyLoginBody , verifyRegisterBody, verifyIfUserIsLogged , verifyIfEmailExistBody , verifyResetPasswordBody }
+//end
+
+const verifyIfUserIsLogged = async (req, res, next) => {
+    const auth = req.header('Authorization');
+    if (!auth) {
+        return res.status(401).json({
+            error: true,
+            message: 'Access denied. No token provided.'
+        });
+    }
+
+    const verified = authService.tokenVerify(auth);
+    if (!verified) {
+        return res.status(401).json({
+            error: true,
+            message: 'Access denied. Invalid token.'
+        });
+    }
+
+    const user = await authService.verifyIfIsUnique('_id', verified.id);
+    if (!user) {
+        return res.status(401).json({
+            error: true,
+            message: 'Access denied. User not found.'
+        });
+    }
+
+    req.auth = user;
+    next();
+};
+
+module.exports = { verifyLoginBody , verifyRegisterBody, verifyIfUserIsLogged , verifyIfEmailExistBody , verifyResetPasswordBody , verifyOTP }

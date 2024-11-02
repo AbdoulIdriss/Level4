@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const sequelize = require('./config/database')
+const sequelize = require('./dbconfig/database')
 
 
 const userRoute = require('./Routes/user.route')
 
-const app = express();
+const app = express(); 
 
 // Parse the requests of content-type 'application/json'
 app.use(bodyParser.json())

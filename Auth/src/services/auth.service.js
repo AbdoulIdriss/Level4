@@ -124,30 +124,34 @@ const generateOTP = async(id_user) => {
 }
 
 const verifyOTP = async( email , code) => {
-    const userOTP = await UserOPT.findOne({ code: code , expired_at: { $gt : new Date() } }) //$gt is greater than . here we compare current date and the date we recieved the otp
-                                 .populate({ path: 'id_user', select : { email : 1 }}) //populate used to get informations from the parent ( used when using the reference method in the schema)
-    return !!(userOTP && userOTP.id_user.email === email ); // the !! is to precise that if there's something, it returns true and if there's not, it returns false
+    const userOTP = await UserOTP.findOne({ code: code , expired_at: { $gt : new Date() } }) //$gt is greater than . here we compare current date and the date we recieved the otp
+                                 .populate({ path: 'user_id', select : { email : 1 }}) //populate used to get informations from the parent ( used when using the reference method in the schema)
+    return !!(userOTP && userOTP.user_id.email === email ); // the !! is to precise that if there's something, it returns true and if there's not, it returns false
 }
 
 const resetPassword = async( password , code  ) => {
+
     try {
         const userOTP = await UserOTP.findOne({code: code});
+
         if (!userOTP) {
             return {
                 error: true,
                 message: 'Invalid OTP'
             }
         }
-        const user = await User.findById(userOTP.id_user);
+        const user = await User.findById(userOTP.user_id);
         if(!user) {
             return {
                 error: true,
                 message: 'user not found'
             }
         }
-        user.password = hashPassword(password);
+        
+        user.password = await hashPassword(password);
         await user.save();
-        await userOTP.deleteOne({_id:userOTP._id});
+        await userOTP.deleteOne({_id: userOTP._id});
+        console.log(user.password)
 
         return {
             error: false,

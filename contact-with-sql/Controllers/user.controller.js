@@ -35,7 +35,7 @@ const createUser = async( req , res ) => {
     }
 }
 
-const  updateUser = async( req , res ) => {
+const updateUser = async( req , res ) => {
     
     try {
         const id = req.params.id;

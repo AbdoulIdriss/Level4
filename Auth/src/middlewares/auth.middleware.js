@@ -112,26 +112,19 @@ const verifyResetPasswordBody = async( req , res , next ) => {
     const { password , confirm_password , code } = req.body;
 
     if (!code) {
-         res.status(400).json({
+        return res.status(400).json({
             error: true,
             message: 'Please enter code'
         })
     }
-    
-    if (!password || !confirm_password) {
-         res.status(400).json({
-            error: true,
-            message: 'Body must contain password and confirm_password'
-        })  
-        
-    }
 
     if ( password !== confirm_password ) {
-         res.status(400).json({
+        return res.status(400).json({
             error: true,
             message: "Passwords don't match."
         })
     }
+
     next();
 }
 

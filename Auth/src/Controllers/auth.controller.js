@@ -34,7 +34,8 @@ const verifyOTP = async( req , res  ) => {
 const resetPassword = async( req , res  ) => {
     const { password , code } = req.body;
     const reset = await authService.resetPassword( password , code );
-    return res.status( reset.error ? 400 : 200 ).json(reset);
+    const status =  reset.error ? 400 : 200 ;
+    return res.status(status).json(reset)
 }
 
 module.exports = { login , register , verifyOTP , forgotPassword , resetPassword }

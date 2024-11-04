@@ -21,7 +21,7 @@ mongoose.connect(process.env.DATABASE_URL)
 
         app.listen(process.env.PORT , () => {
 
-            console.log('listening on http://localhost:3001');
+            console.log('listening on http://localhost:3000');
             
         })
 

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const userOTPSchema = new Schema({
-    code :{
+    code:{
         type: String,
         required: true,
     },

@@ -29,7 +29,7 @@ if (form) {
                 const token = response.token;
                 localStorage.setItem('token' , token)
 
-                window.location.replace('http://127.0.0.1:5500/frontend/simple-js/dashboard.html');
+                window.location.replace('http://localhost:63342/frontend/simple-js/dashboard.html');
                 
             } else {
                 alert(response.message)

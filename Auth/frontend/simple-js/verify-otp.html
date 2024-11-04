@@ -11,7 +11,8 @@
     <section class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
         <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6 dark:bg-gray-800">
             <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">Enter Your Reset Code</h1>
-            <form id="resetCodeForm" class="space-y-4">
+
+            <form action="http://localhost:3000/auth/verify-otp" class="space-y-4" method="post" >
                 <label for="resetCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reset Code:</label>
                 <input type="text" id="resetCode" name="resetCode" placeholder="1234" required class="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white">
 
@@ -23,53 +24,46 @@
     </section>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
 
-            const savedOTPCode = sessionStorage.getItem('generatedOTP');
+        const form = document.querySelector('form');
 
-            const email = sessionStorage.getItem('email')
-            const code = sessionStorage.getItem('code')
+        if (form) {
 
-            document.getElementById("resetCode").value = code;
+            sessionStorage.getItem('generatedOTP');
+            const email = sessionStorage.getItem('email');
 
-            // Redirect to email verification if resetCode isn't available
-            if (!savedOTPCode) {
-                alert("No reset code found. Please verify your email first.");
-                window.location.href = 'http://127.0.0.1:5500/frontend/simple-js/forgot-password.html';
-                return;
-            }
-
-            document.getElementById('resetCodeForm').addEventListener('submit', async (event) => {
-                event.preventDefault();
-                    const data = {
-                        email:email,
-                        code:code
-                    }
-
-                // Send email and reset code to validate on the server
-                try {
-                    const response = await fetch('http://localhost:3001/auth/reset-password', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-                    
-                    const request = await response.json();
-                    
-                    if (request.ok) {
-                        // window.location.replace('http://127.0.0.1/50');
-                    } else {
-                        // Code is correct, proceed to the reset password page
-                        alert("Code validated successfully.");
-
-                        window.location.href = 'reset-password.html';
-                    }
-                } catch (error) {
-                    console.error('Error validating reset code:', error);
-                    alert("An error occurred. Please try again.");
+            form.addEventListener('submit' , async(e) => {
+                e.preventDefault()
+                const formData = new FormData(form)
+                const data = {
+                    code : formData.get('resetCode'),
+                    email
                 }
-            });
-        });
+
+                // try {
+                    const request = await fetch(form.action , {
+                        method: form.method,
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+
+                    const response = await request.json();
+                    console.log('response is :', response);
+
+                    if (request.ok) {
+                        window.location.href = 'reset-password.html'
+                    }else {
+                        alert('code is incorrect')
+                    }
+
+                // }catch (error){
+                //     console.log('Error', error);
+                // }
+            })
+        }
+
     </script>
 
 </body>
